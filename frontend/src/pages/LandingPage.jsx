@@ -48,7 +48,7 @@ const LandingPage = () => {
                         <h4 className="text-xl font-bold mb-2">Free</h4>
                         <p className="text-4xl font-extrabold mb-6">₹0<span className="text-lg text-slate-400 font-normal">/month</span></p>
                         <ul className="text-left space-y-3 mb-8">
-                            <li className="flex items-center gap-2 text-slate-400"><CheckCircle size={18} className="text-secondary" /> 3 PDFs per month</li>
+                            <li className="flex items-center gap-2 text-slate-400"><CheckCircle size={18} className="text-secondary" /> 20 PDFs per month</li>
                             <li className="flex items-center gap-2 text-slate-400"><CheckCircle size={18} className="text-secondary" /> Basic Summaries</li>
                             <li className="flex items-center gap-2 text-slate-400"><CheckCircle size={18} className="text-secondary" /> Key Points</li>
                         </ul>
@@ -56,15 +56,15 @@ const LandingPage = () => {
                     </div>
                     <div className="flex-1 bg-slate-900 p-8 rounded-2xl border-2 border-primary relative overflow-hidden">
                         <div className="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-3 py-1 rounded-bl-lg">POPULAR</div>
-                        <h4 className="text-xl font-bold mb-2">Pro</h4>
-                        <p className="text-4xl font-extrabold mb-6">₹49<span className="text-lg text-slate-400 font-normal">/month</span></p>
+                        <h4 className="text-xl font-bold mb-2">Genie Pro</h4>
+                        <p className="text-4xl font-extrabold mb-6">₹59<span className="text-lg text-slate-400 font-normal">/month</span></p>
                         <ul className="text-left space-y-3 mb-8">
                             <li className="flex items-center gap-2 text-slate-300"><CheckCircle size={18} className="text-secondary" /> Unlimited PDFs</li>
                             <li className="flex items-center gap-2 text-slate-300"><CheckCircle size={18} className="text-secondary" /> Detailed AI Notes</li>
-                            <li className="flex items-center gap-2 text-slate-300"><CheckCircle size={18} className="text-secondary" /> Question Generation</li>
+                            <li className="flex items-center gap-2 text-slate-300"><CheckCircle size={18} className="text-secondary" /> Flowcharts & Quizzes</li>
                             <li className="flex items-center gap-2 text-slate-300"><CheckCircle size={18} className="text-secondary" /> Priority Support</li>
                         </ul>
-                        <button className="block w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-primary/30">Get Pro</button>
+                        <Link to="/register" className="block w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-primary/30 text-center">Get Pro</Link>
                     </div>
                 </div>
             </div>
