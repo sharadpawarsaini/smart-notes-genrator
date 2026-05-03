@@ -23,7 +23,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const { auth } = require('./middleware/auth');
+const auth = require('./middleware/auth');
 const paymentController = require('./controllers/paymentController');
 
 app.use('/api/auth', require('./routes/auth'));
