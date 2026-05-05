@@ -1,6 +1,7 @@
 const Note = require('../models/Note');
 const User = require('../models/User');
 const pdf = require('pdf-parse');
+const Tesseract = require('tesseract.js');
 const Groq = require('groq-sdk');
 
 const groq = new Groq({
@@ -40,6 +41,54 @@ exports.uploadPDF = async (req, res) => {
     } catch (err) {
         console.error('Upload Error:', err);
         res.status(500).json({ message: `PDF Parsing Failed: ${err.message}` });
+    }
+};
+
+exports.processOCR = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findById(userId);
+
+        // Check if user is Pro OR has trials left
+        if (!user.isSubscribed && user.ocrTrials <= 0) {
+            return res.status(403).json({ 
+                message: 'OCR trials exhausted. Upgrade to Pro for unlimited handwritten & image notes.',
+                limitReached: true
+            });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'Please upload an image file' });
+        }
+
+        console.log('Processing OCR for:', req.file.originalname);
+        
+        // Tesseract processing
+        const { data: { text } } = await Tesseract.recognize(
+            req.file.buffer,
+            'eng',
+            { logger: m => console.log(m.status, m.progress) }
+        );
+
+        if (!text || text.trim().length < 10) {
+            return res.status(400).json({ message: 'Could not extract enough text from the image. Please ensure it is clear.' });
+        }
+
+        // Decrement trials if not subscribed
+        if (!user.isSubscribed) {
+            user.ocrTrials -= 1;
+            await user.save();
+        }
+
+        res.json({ 
+            extractedText: text, 
+            fileName: req.file.originalname,
+            trialsLeft: user.isSubscribed ? 'unlimited' : user.ocrTrials 
+        });
+
+    } catch (err) {
+        console.error('OCR Error:', err);
+        res.status(500).json({ message: `OCR Processing Failed: ${err.message}` });
     }
 };
 

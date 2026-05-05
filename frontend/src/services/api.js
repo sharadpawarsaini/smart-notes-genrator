@@ -25,6 +25,9 @@ export const notesService = {
     uploadPDF: (formData) => api.post('/notes/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     }),
+    uploadImage: (formData) => api.post('/notes/ocr', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
     generateNotes: (data) => api.post('/notes/generate-notes', data),
     generateYouTubeNotes: (youtubeUrl) => api.post('/notes/youtube', { youtubeUrl }),
     chatWithNote: (noteId, message) => api.post('/notes/chat', { noteId, message }),

@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     isSubscribed: { type: Boolean, default: false },
     notesCount: { type: Number, default: 0 },
+    ocrTrials: { type: Number, default: 3 },
     lastNoteReset: { type: Date, default: Date.now }
 });
 

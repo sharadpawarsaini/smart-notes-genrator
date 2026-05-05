@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { notesService, authService } from '../services/api';
-import { Upload, File, X, AlertCircle, Loader2, Play, ArrowRight, Brain, Zap, Globe } from 'lucide-react';
+import { Upload, File, X, AlertCircle, Loader2, Play, ArrowRight, Brain, Zap, Globe, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const UploadPage = () => {
-    const [activeTab, setActiveTab] = useState('pdf'); // 'pdf' or 'youtube'
+    const [activeTab, setActiveTab] = useState('pdf'); // 'pdf', 'youtube', or 'ocr'
     const [file, setFile] = useState(null);
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [status, setStatus] = useState('idle'); // idle, uploading, generating, error
@@ -27,11 +27,22 @@ const UploadPage = () => {
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
-        if (selectedFile && selectedFile.type === 'application/pdf') {
-            setFile(selectedFile);
-            setError('');
-        } else {
-            setError('Please select a valid PDF file.');
+        if (!selectedFile) return;
+
+        if (activeTab === 'pdf') {
+            if (selectedFile.type === 'application/pdf') {
+                setFile(selectedFile);
+                setError('');
+            } else {
+                setError('Please select a valid PDF file.');
+            }
+        } else if (activeTab === 'ocr') {
+            if (selectedFile.type.startsWith('image/')) {
+                setFile(selectedFile);
+                setError('');
+            } else {
+                setError('Please select a valid Image file (JPEG/PNG).');
+            }
         }
     };
 
@@ -44,13 +55,24 @@ const UploadPage = () => {
         
         try {
             let notesRes;
-            if (activeTab === 'pdf') {
+            if (activeTab === 'pdf' || activeTab === 'ocr') {
                 const formData = new FormData();
-                formData.append('pdf', file);
+                let uploadRes;
 
-                // 1. Upload and Extract Text
-                const uploadRes = await notesService.uploadPDF(formData);
+                if (activeTab === 'pdf') {
+                    formData.append('pdf', file);
+                    uploadRes = await notesService.uploadPDF(formData);
+                } else {
+                    formData.append('image', file);
+                    uploadRes = await notesService.uploadImage(formData);
+                }
+
                 const { extractedText, fileName } = uploadRes.data;
+                
+                // Update user state if trials were used
+                if (uploadRes.data.trialsLeft !== undefined) {
+                    setUser(prev => ({ ...prev, ocrTrials: uploadRes.data.trialsLeft }));
+                }
 
                 setStatus('generating');
                 
@@ -104,12 +126,18 @@ const UploadPage = () => {
                     >
                         <File size={20} /> PDF Document
                     </button>
-                        <button 
-                            onClick={() => { setActiveTab('youtube'); setStatus('idle'); }}
-                            className={`px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${activeTab === 'youtube' ? 'bg-red-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
-                        >
-                            <Play size={20} /> YouTube Video
-                        </button>
+                    <button 
+                        onClick={() => { setActiveTab('ocr'); setStatus('idle'); setFile(null); }}
+                        className={`px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${activeTab === 'ocr' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                    >
+                        <ImageIcon size={20} /> Image / Handwritten
+                    </button>
+                    <button 
+                        onClick={() => { setActiveTab('youtube'); setStatus('idle'); setFile(null); }}
+                        className={`px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${activeTab === 'youtube' ? 'bg-red-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                    >
+                        <Play size={20} /> YouTube Video
+                    </button>
                 </div>
             </div>
 
@@ -162,6 +190,59 @@ const UploadPage = () => {
                                             <Zap size={20} /> Generate Notes
                                         </button>
                                     </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : activeTab === 'ocr' ? (
+                        <div className="text-center">
+                            {!file ? (
+                                <div className="relative group cursor-pointer">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    />
+                                    <div className="border-4 border-dashed border-slate-700 group-hover:border-indigo-500/50 transition-all rounded-[2rem] py-20 bg-slate-900/30">
+                                        <div className="bg-indigo-500/10 w-24 h-24 rounded-full flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform">
+                                            <ImageIcon className="text-indigo-400" size={40} />
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-3">Upload Image or Handwritten Note</h3>
+                                        <p className="text-slate-500 mb-2">Capture your physical notes or upload photos</p>
+                                        
+                                        {user && !user.isSubscribed && (
+                                            <div className="mt-6 inline-flex items-center gap-2 bg-indigo-500/20 text-indigo-300 px-4 py-2 rounded-full text-sm font-bold border border-indigo-500/30">
+                                                <Sparkles size={16} /> {user.ocrTrials} Trials Remaining
+                                            </div>
+                                        )}
+
+                                        <p className="text-xs text-slate-600 uppercase tracking-widest font-black mt-6">JPG, PNG, WEBP • Max 10MB</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center">
+                                    <div className="relative mb-8">
+                                        <img 
+                                            src={URL.createObjectURL(file)} 
+                                            alt="Preview" 
+                                            className="w-48 h-48 object-cover rounded-3xl border-4 border-slate-700 shadow-2xl"
+                                        />
+                                        <button 
+                                            onClick={() => setFile(null)}
+                                            className="absolute -top-3 -right-3 bg-red-500 text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                    <h3 className="text-3xl font-bold mb-3">{file.name}</h3>
+                                    <p className="text-slate-500 mb-10">AI will extract text from this image to build your notes.</p>
+                                    
+                                    <button
+                                        onClick={handleUpload}
+                                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-12 py-4 rounded-2xl font-bold transition shadow-xl shadow-indigo-600/30 flex items-center gap-2"
+                                    >
+                                        <Sparkles size={20} /> Extract & Generate
+                                    </button>
                                 </div>
                             )}
                         </div>
