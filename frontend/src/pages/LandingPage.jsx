@@ -122,7 +122,7 @@ const LandingPage = () => {
                 >
                     {[
                         { icon: <Brain />, title: "Smart Summary", desc: "Complex concepts simplified into easy-to-read bullet points." },
-                        { icon: <Zap />, title: "Flashcards", desc: "Auto-generate study cards to help you memorize faster." },
+                        { icon: <Shield />, title: "Handwritten Notes", desc: "Upload photos of your physical notes and turn them into digital ones." },
                         { icon: <Play />, title: "Video Summaries", desc: "Paste a YouTube link and get notes from lectures instantly." },
                         { icon: <Download />, title: "PDF Export", desc: "Download your beautifully formatted notes for offline study." },
                     ].map((feature, idx) => (
@@ -154,6 +154,7 @@ const LandingPage = () => {
                             <ul className="text-left space-y-4 mb-10">
                                 <li className="flex items-center gap-3 text-slate-400"><CheckCircle size={18} className="text-secondary" /> 3 notes per day</li>
                                 <li className="flex items-center gap-3 text-slate-400"><CheckCircle size={18} className="text-secondary" /> AI Summaries</li>
+                                <li className="flex items-center gap-3 text-slate-400"><CheckCircle size={18} className="text-secondary" /> 3 Handwritten OCR Trials</li>
                                 <li className="flex items-center gap-3 text-slate-400 line-through opacity-30"><CheckCircle size={18} className="text-secondary" /> PDF Export</li>
                                 <li className="flex items-center gap-3 text-slate-400 line-through opacity-30"><CheckCircle size={18} className="text-secondary" /> YouTube Summaries</li>
                             </ul>
@@ -168,6 +169,7 @@ const LandingPage = () => {
                                 <li className="flex items-center gap-3 text-slate-200"><CheckCircle size={18} className="text-secondary" /> Unlimited AI Notes</li>
                                 <li className="flex items-center gap-3 text-slate-200"><CheckCircle size={18} className="text-secondary" /> Unlimited PDF Exports</li>
                                 <li className="flex items-center gap-3 text-slate-200"><CheckCircle size={18} className="text-secondary" /> Flashcards & Quizzes</li>
+                                <li className="flex items-center gap-3 text-slate-200"><CheckCircle size={18} className="text-secondary" /> Unlimited Handwritten OCR</li>
                                 <li className="flex items-center gap-3 text-slate-200"><CheckCircle size={18} className="text-secondary" /> YouTube Video Notes</li>
                                 <li className="flex items-center gap-3 text-slate-200"><CheckCircle size={18} className="text-secondary" /> Priority AI Models</li>
                             </ul>
