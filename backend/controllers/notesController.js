@@ -1,7 +1,7 @@
 const Note = require('../models/Note');
 const User = require('../models/User');
 const pdf = require('pdf-parse');
-const axios = require('axios');
+const Tesseract = require('tesseract.js');
 const Groq = require('groq-sdk');
 
 const groq = new Groq({
@@ -61,31 +61,19 @@ exports.processOCR = async (req, res) => {
             return res.status(400).json({ message: 'Please upload an image file' });
         }
 
-        console.log('Processing OCR with OCR.space for:', req.file.originalname);
+        console.log('Processing OCR with Tesseract for:', req.file.originalname);
         
-        // Prepare Form Data for OCR.space
-        const formData = new URLSearchParams();
-        formData.append('base64Image', `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`);
-        formData.append('language', 'eng');
-        formData.append('apikey', process.env.OCR_SPACE_API_KEY || 'helloworld'); // Use 'helloworld' as default free key
-        formData.append('isOverlayRequired', 'false');
-        formData.append('detectOrientation', 'true');
-        formData.append('scale', 'true');
-        formData.append('OCREngine', '2'); // Engine 2 is better for handwriting/complex layouts
-
-        const ocrResponse = await axios.post('https://api.ocr.space/parse/image', formData, {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        });
-
-        if (ocrResponse.data.OCRExitCode !== 1) {
-            console.error('OCR.space Error:', ocrResponse.data.ErrorMessage);
-            return res.status(400).json({ message: `OCR Failed: ${ocrResponse.data.ErrorMessage[0]}` });
-        }
-
-        const text = ocrResponse.data.ParsedResults[0].ParsedText;
+        // Use Tesseract.js for local extraction
+        const { data: { text } } = await Tesseract.recognize(
+            req.file.buffer,
+            'eng',
+            { 
+                logger: m => console.log(`[OCR] ${m.status}: ${Math.round(m.progress * 100)}%`) 
+            }
+        );
 
         if (!text || text.trim().length < 5) {
-            return res.status(400).json({ message: 'Could not extract text. Please ensure the image is clear and contains readable text.' });
+            return res.status(400).json({ message: 'Could not extract text. Please ensure the image is clear and readable.' });
         }
 
         // Decrement trials if not subscribed
