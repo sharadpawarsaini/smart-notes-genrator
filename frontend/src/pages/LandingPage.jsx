@@ -163,7 +163,7 @@ const LandingPage = () => {
                             <div className="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl tracking-wider">BEST VALUE</div>
                             <h4 className="text-xl font-bold mb-2">Exam Pro</h4>
                             <p className="text-slate-500 mb-6 text-sm italic">For serious students</p>
-                            <p className="text-5xl font-extrabold mb-8 text-white">₹99<span className="text-lg text-slate-500 font-normal">/month</span></p>
+                            <p className="text-5xl font-extrabold mb-8 text-white">₹59<span className="text-lg text-slate-500 font-normal">/month</span></p>
                             <ul className="text-left space-y-4 mb-10">
                                 <li className="flex items-center gap-3 text-slate-200"><CheckCircle size={18} className="text-secondary" /> Unlimited AI Notes</li>
                                 <li className="flex items-center gap-3 text-slate-200"><CheckCircle size={18} className="text-secondary" /> Unlimited PDF Exports</li>
