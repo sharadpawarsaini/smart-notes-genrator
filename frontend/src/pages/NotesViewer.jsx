@@ -6,8 +6,9 @@ import {
     HelpCircle, Hash, MessageSquare, RotateCw, 
     Send, FileText, Volume2, VolumeX, 
     BrainCircuit, CheckCircle2, Trash2, Trophy, Loader2,
-    Zap, Compass, LayoutList
+    Zap, Compass, LayoutList, Lock
 } from 'lucide-react';
+import { notesService, authService } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import mermaid from 'mermaid';
 import html2pdf from 'html2pdf.js';
@@ -53,26 +54,23 @@ const NotesViewer = () => {
     const [quizResults, setQuizResults] = useState(null);
     const [gradingLoading, setGradingLoading] = useState(false);
     const [downloading, setDownloading] = useState(false);
+    const [user, setUser] = useState(null);
     
     const chatEndRef = useRef(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchNote = async () => {
+        const fetchUser = async () => {
             try {
-                const res = await notesService.getNoteById(id);
-                setNote(res.data);
-                if (res.data.flashcards?.length > 0) {
-                    setChatMessages([{ role: 'ai', content: `Hi! I'm NoteGenie. I've analyzed "${res.data.originalFileName}". You can ask me anything about it!` }]);
-                }
+                const res = await authService.getMe();
+                setUser(res.data);
             } catch (err) {
-                console.error('Failed to fetch note');
-                navigate('/dashboard');
-            } finally {
-                setLoading(false);
+                console.error('Failed to fetch user');
             }
         };
+
         fetchNote();
+        fetchUser();
     }, [id]);
 
     useEffect(() => {
@@ -80,6 +78,11 @@ const NotesViewer = () => {
     }, [chatMessages]);
 
     const handleDownload = () => {
+        if (!user?.isSubscribed) {
+            alert('PDF Export is a Pro feature. Please upgrade to Genine Pro in the dashboard to download notes.');
+            return;
+        }
+
         const element = document.getElementById('printable-content');
         if (!element) return;
         
@@ -189,8 +192,17 @@ const NotesViewer = () => {
                             <div className="flex gap-3">
                                 <button onClick={() => toggleSpeech(note.summary.detailed)} className={`p-4 rounded-2xl transition print:hidden ${isSpeaking ? 'bg-secondary text-white' : 'bg-white/10 hover:bg-white/20'}`}>{isSpeaking ? <VolumeX size={24} /> : <Volume2 size={24} />}</button>
                                 <button onClick={handleDelete} className="bg-red-500/10 hover:bg-red-500/30 p-4 rounded-2xl transition text-red-400 print:hidden border border-red-500/20"><Trash2 size={24} /></button>
-                                <button onClick={handleDownload} disabled={downloading} className="bg-white/10 hover:bg-white/20 p-4 rounded-2xl transition print:hidden disabled:opacity-50">
+                                <button 
+                                    onClick={handleDownload} 
+                                    disabled={downloading} 
+                                    className={`p-4 rounded-2xl transition print:hidden disabled:opacity-50 relative group ${!user?.isSubscribed ? 'bg-slate-700/50 text-slate-500' : 'bg-white/10 hover:bg-white/20'}`}
+                                >
                                     {downloading ? <Loader2 size={24} className="animate-spin" /> : <Download size={24} />}
+                                    {!user?.isSubscribed && (
+                                        <div className="absolute -top-1 -right-1 bg-yellow-500 text-slate-900 rounded-full p-1 border-2 border-slate-900 group-hover:scale-110 transition-all">
+                                            <Lock size={10} />
+                                        </div>
+                                    )}
                                 </button>
                             </div>
                         </div>

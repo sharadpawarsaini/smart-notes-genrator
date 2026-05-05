@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { uploadPDF, generateNotes, getNotes, getNoteById, chatWithNote, deleteNote, gradeQuiz } = require('../controllers/notesController');
+const { uploadPDF, generateNotes, getNotes, getNoteById, chatWithNote, deleteNote, gradeQuiz, summarizeYouTube } = require('../controllers/notesController');
 const auth = require('../middleware/auth');
 
 const storage = multer.memoryStorage();
@@ -12,6 +12,7 @@ router.post('/upload', (req, res, next) => {
     next();
 }, auth, upload.single('pdf'), uploadPDF);
 router.post('/generate-notes', auth, generateNotes);
+router.post('/youtube', auth, summarizeYouTube);
 router.post('/chat', auth, chatWithNote);
 router.post('/grade-quiz', auth, gradeQuiz);
 router.get('/', auth, getNotes);

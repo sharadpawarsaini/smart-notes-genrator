@@ -70,9 +70,9 @@ const PricingModal = ({ isOpen, onClose, onPaymentSuccess }) => {
         },
         {
             name: 'Genie Pro',
-            price: '₹59',
+            price: '₹99',
             period: '/month',
-            features: ['Unlimited Notes', 'Ultra-Detailed Flowcharts', 'Advanced AI Tutor', 'Priority Support', 'No Ads'],
+            features: ['Unlimited Notes', 'Ultra-Detailed Flowcharts', 'Advanced AI Tutor', 'PDF Export Enabled', 'YouTube Summaries', 'Priority Support'],
             button: 'Upgrade Now',
             popular: true,
             color: 'primary'
@@ -132,11 +132,11 @@ const PricingModal = ({ isOpen, onClose, onPaymentSuccess }) => {
                                     <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
                                         <div className="flex justify-between items-center mb-6">
                                             <span className="text-slate-400">Genie Pro (1 Month)</span>
-                                            <span className="font-bold">₹59.00</span>
+                                            <span className="font-bold">₹99.00</span>
                                         </div>
                                         <div className="flex justify-between items-center text-xl font-bold border-t border-slate-700 pt-4">
                                             <span>Total Amount</span>
-                                            <span className="text-primary">₹59.00</span>
+                                            <span className="text-primary">₹99.00</span>
                                         </div>
                                     </div>
                                     

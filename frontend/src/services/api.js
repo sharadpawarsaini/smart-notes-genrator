@@ -26,6 +26,7 @@ export const notesService = {
         headers: { 'Content-Type': 'multipart/form-data' }
     }),
     generateNotes: (data) => api.post('/notes/generate-notes', data),
+    generateYouTubeNotes: (youtubeUrl) => api.post('/notes/youtube', { youtubeUrl }),
     chatWithNote: (noteId, message) => api.post('/notes/chat', { noteId, message }),
     gradeQuiz: (noteId, answers) => api.post('/notes/grade-quiz', { noteId, answers }),
     getNotes: () => api.get('/notes'),
