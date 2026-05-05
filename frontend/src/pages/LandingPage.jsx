@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Zap, Shield, CheckCircle, ArrowRight, Star, Users, Brain, Youtube, Download } from 'lucide-react';
+import { FileText, Zap, Shield, CheckCircle, ArrowRight, Star, Users, Brain, Play, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const LandingPage = () => {
@@ -123,7 +123,7 @@ const LandingPage = () => {
                     {[
                         { icon: <Brain />, title: "Smart Summary", desc: "Complex concepts simplified into easy-to-read bullet points." },
                         { icon: <Zap />, title: "Flashcards", desc: "Auto-generate study cards to help you memorize faster." },
-                        { icon: <Youtube />, title: "Video Summaries", desc: "Paste a YouTube link and get notes from lectures instantly." },
+                        { icon: <Play />, title: "Video Summaries", desc: "Paste a YouTube link and get notes from lectures instantly." },
                         { icon: <Download />, title: "PDF Export", desc: "Download your beautifully formatted notes for offline study." },
                     ].map((feature, idx) => (
                         <motion.div 

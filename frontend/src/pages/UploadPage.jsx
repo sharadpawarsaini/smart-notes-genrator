@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { notesService, authService } from '../services/api';
-import { Upload, File, X, AlertCircle, Loader2, Youtube, ArrowRight, Brain, Zap, Globe } from 'lucide-react';
+import { Upload, File, X, AlertCircle, Loader2, Play, ArrowRight, Brain, Zap, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const UploadPage = () => {
@@ -104,12 +104,12 @@ const UploadPage = () => {
                     >
                         <File size={20} /> PDF Document
                     </button>
-                    <button 
-                        onClick={() => { setActiveTab('youtube'); setStatus('idle'); }}
-                        className={`px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${activeTab === 'youtube' ? 'bg-red-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
-                    >
-                        <Youtube size={20} /> YouTube Video
-                    </button>
+                        <button 
+                            onClick={() => { setActiveTab('youtube'); setStatus('idle'); }}
+                            className={`px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${activeTab === 'youtube' ? 'bg-red-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                        >
+                            <Play size={20} /> YouTube Video
+                        </button>
                 </div>
             </div>
 
@@ -168,7 +168,7 @@ const UploadPage = () => {
                     ) : (
                         <div className="text-center">
                             <div className="bg-red-500/10 w-24 h-24 rounded-full flex items-center justify-center mb-8 mx-auto">
-                                <Youtube className="text-red-500" size={40} />
+                                <Play className="text-red-500" size={40} />
                             </div>
                             <h3 className="text-2xl font-bold mb-3">Video Summarization</h3>
                             <p className="text-slate-500 mb-10">Paste a YouTube URL to generate notes from lecture or educational videos.</p>
