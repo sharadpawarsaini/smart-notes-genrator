@@ -1,10 +1,8 @@
 const Note = require('../models/Note');
 const User = require('../models/User');
 const pdf = require('pdf-parse');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const axios = require('axios');
 const Groq = require('groq-sdk');
-
-const genAI = new GoogleGenerativeAI((process.env.GEMINI_API_KEY || '').trim());
 
 const groq = new Groq({
     apiKey: (process.env.GROQ_API_KEY || '').trim()
@@ -63,25 +61,31 @@ exports.processOCR = async (req, res) => {
             return res.status(400).json({ message: 'Please upload an image file' });
         }
 
-        console.log('Processing OCR with Gemini for:', req.file.originalname);
+        console.log('Processing OCR with OCR.space for:', req.file.originalname);
         
-        // Use Gemini 1.5 Flash for super-fast OCR & Handwriting recognition
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Prepare Form Data for OCR.space
+        const formData = new URLSearchParams();
+        formData.append('base64Image', `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`);
+        formData.append('language', 'eng');
+        formData.append('apikey', process.env.OCR_SPACE_API_KEY || 'helloworld'); // Use 'helloworld' as default free key
+        formData.append('isOverlayRequired', 'false');
+        formData.append('detectOrientation', 'true');
+        formData.append('scale', 'true');
+        formData.append('OCREngine', '2'); // Engine 2 is better for handwriting/complex layouts
 
-        const result = await model.generateContent([
-            "Extract all text from this image accurately. If it is handwritten, transcribe it carefully. Only return the extracted text, no extra commentary.",
-            {
-                inlineData: {
-                    data: req.file.buffer.toString("base64"),
-                    mimeType: req.file.mimetype,
-                },
-            },
-        ]);
+        const ocrResponse = await axios.post('https://api.ocr.space/parse/image', formData, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
 
-        const text = result.response.text();
+        if (ocrResponse.data.OCRExitCode !== 1) {
+            console.error('OCR.space Error:', ocrResponse.data.ErrorMessage);
+            return res.status(400).json({ message: `OCR Failed: ${ocrResponse.data.ErrorMessage[0]}` });
+        }
+
+        const text = ocrResponse.data.ParsedResults[0].ParsedText;
 
         if (!text || text.trim().length < 5) {
-            return res.status(400).json({ message: 'Could not extract text. Please ensure the image is clear.' });
+            return res.status(400).json({ message: 'Could not extract text. Please ensure the image is clear and contains readable text.' });
         }
 
         // Decrement trials if not subscribed
