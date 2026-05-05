@@ -59,6 +59,21 @@ const NotesViewer = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const fetchNote = async () => {
+            try {
+                const res = await notesService.getNoteById(id);
+                setNote(res.data);
+                if (res.data.flashcards?.length > 0) {
+                    setChatMessages([{ role: 'ai', content: `Hi! I'm NoteGenie. I've analyzed "${res.data.originalFileName}". You can ask me anything about it!` }]);
+                }
+            } catch (err) {
+                console.error('Failed to fetch note');
+                navigate('/dashboard');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         const fetchUser = async () => {
             try {
                 const res = await authService.getMe();
