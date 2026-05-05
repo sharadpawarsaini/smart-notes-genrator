@@ -186,13 +186,13 @@ const NotesViewer = () => {
                     <ChevronLeft size={20} /> Back to Dashboard
                 </button>
                 <div className="flex flex-wrap justify-center bg-slate-800 p-1 rounded-xl border border-slate-700 shadow-lg">
-                    {['notes', 'flashcards', 'mindmap', 'quiz', 'chat'].map(tab => (
+                    {['notes', 'flashcards', 'mindmap', 'quiz', 'chat', 'exam'].map(tab => (
                         <button 
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`px-4 py-2 rounded-lg transition capitalize text-sm md:text-base ${activeTab === tab ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
                         >
-                            {tab === 'mindmap' ? 'Flowchart' : tab}
+                            {tab === 'mindmap' ? 'Flowchart' : tab === 'exam' ? 'Exam Predictor' : tab}
                         </button>
                     ))}
                 </div>
@@ -341,6 +341,61 @@ const NotesViewer = () => {
                             <div ref={chatEndRef} />
                         </div>
                         <form onSubmit={handleChat} className="p-6 bg-slate-900/50 border-t border-slate-700 flex gap-4"><input type="text" value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Ask about the document..." className="flex-1 bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary transition-all text-lg shadow-inner" /><button type="submit" disabled={chatLoading} className="bg-primary hover:bg-blue-700 p-4 rounded-2xl transition-all disabled:opacity-50 shadow-xl shadow-primary/20"><Send size={28} /></button></form>
+                    </motion.div>
+                )}
+
+                {activeTab === 'exam' && (
+                    <motion.div key="exam" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-800 rounded-[2.5rem] border border-slate-700 p-10">
+                        <div className="flex items-center justify-between mb-10">
+                            <div className="flex items-center gap-4 text-purple-400">
+                                <Trophy size={32} />
+                                <h2 className="text-3xl font-bold uppercase tracking-widest">AI Exam Predictor</h2>
+                            </div>
+                            {!user?.isSubscribed && <span className="bg-yellow-500 text-slate-900 px-4 py-1 rounded-full font-bold text-xs">PRO FEATURE</span>}
+                        </div>
+
+                        {!user?.isSubscribed ? (
+                            <div className="text-center py-20 bg-slate-900/50 rounded-[2rem] border border-dashed border-slate-700">
+                                <Lock size={48} className="mx-auto mb-6 text-slate-600" />
+                                <h3 className="text-2xl font-bold mb-4">Exam Predictions are Locked</h3>
+                                <p className="text-slate-400 mb-8 max-w-md mx-auto">Upgrade to Genie Pro to unlock AI-powered exam questions predicted specifically for this document.</p>
+                                <button onClick={() => navigate('/dashboard')} className="bg-primary hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-primary/20">Upgrade Now</button>
+                            </div>
+                        ) : note.examPredictions?.length > 0 ? (
+                            <div className="space-y-8">
+                                <div className="bg-purple-500/10 border border-purple-500/20 p-6 rounded-2xl mb-8 flex items-center gap-4">
+                                    <Brain size={24} className="text-purple-400" />
+                                    <p className="text-slate-300">Genie has analyzed the key concepts and identified these high-probability exam questions.</p>
+                                </div>
+                                <div className="grid gap-6">
+                                    {note.examPredictions.map((pred, i) => (
+                                        <div key={i} className="bg-slate-900/50 p-8 rounded-[2rem] border border-slate-700/50 hover:border-purple-500/30 transition-all">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <h4 className="text-xl font-bold flex gap-4 text-white">
+                                                    <span className="text-purple-400">Q{i+1}</span>
+                                                    {pred.question}
+                                                </h4>
+                                                <span className={`px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest ${
+                                                    pred.probability === 'High' ? 'bg-red-500/20 text-red-400' :
+                                                    pred.probability === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                    'bg-blue-500/20 text-blue-400'
+                                                }`}>
+                                                    {pred.probability} Probability
+                                                </span>
+                                            </div>
+                                            <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700/50">
+                                                <p className="text-slate-400 text-sm italic mb-2">Genie's Reasoning:</p>
+                                                <p className="text-slate-200">{pred.reasoning}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-20">
+                                <p className="text-slate-500">No predictions available for this note yet.</p>
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>

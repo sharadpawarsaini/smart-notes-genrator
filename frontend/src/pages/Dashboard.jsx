@@ -168,6 +168,7 @@ const Dashboard = () => {
     const [selectedTag, setSelectedTag] = useState('All');
     const [showPricing, setShowPricing] = useState(false);
     const [user, setUser] = useState(null);
+    const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'folders'
 
     useEffect(() => {
         fetchNotes();
@@ -333,6 +334,20 @@ const Dashboard = () => {
                         className="w-full bg-slate-800 border border-slate-700/50 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:border-primary/50 transition-all shadow-inner text-lg"
                     />
                 </div>
+                <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+                    <button 
+                        onClick={() => setViewMode('grid')}
+                        className={`px-6 py-2 rounded-lg font-bold transition-all ${viewMode === 'grid' ? 'bg-primary text-white shadow-lg' : 'text-slate-400'}`}
+                    >
+                        Grid
+                    </button>
+                    <button 
+                        onClick={() => setViewMode('folders')}
+                        className={`px-6 py-2 rounded-lg font-bold transition-all ${viewMode === 'folders' ? 'bg-primary text-white shadow-lg' : 'text-slate-400'}`}
+                    >
+                        Folders
+                    </button>
+                </div>
                 <div className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar w-full md:w-auto">
                     {allTags.map(tag => (
                         <button
@@ -370,7 +385,7 @@ const Dashboard = () => {
                         Upload a PDF
                     </Link>
                 </motion.div>
-            ) : (
+            ) : viewMode === 'grid' ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <AnimatePresence>
                         {filteredNotes.map((note) => (
@@ -427,6 +442,37 @@ const Dashboard = () => {
                             </motion.div>
                         ))}
                     </AnimatePresence>
+                </div>
+            ) : (
+                <div className="space-y-12">
+                    {Object.entries(filteredNotes.reduce((acc, note) => {
+                        const s = note.subject || 'General';
+                        if (!acc[s]) acc[s] = [];
+                        acc[s].push(note);
+                        return acc;
+                    }, {})).map(([subject, subjectNotes]) => (
+                        <div key={subject}>
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="bg-primary/20 p-3 rounded-2xl">
+                                    <Folder className="text-primary" size={24} />
+                                </div>
+                                <h3 className="text-2xl font-bold">{subject}</h3>
+                                <span className="bg-slate-800 text-slate-400 px-3 py-1 rounded-lg text-sm">{subjectNotes.length} Notes</span>
+                            </div>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {subjectNotes.map((note) => (
+                                    <Link 
+                                        key={note._id}
+                                        to={`/notes/${note._id}`}
+                                        className="bg-slate-800/80 border border-slate-700/50 rounded-[2.5rem] p-8 block transition-all hover:border-primary/50 hover:bg-slate-800 shadow-xl group overflow-hidden"
+                                    >
+                                        <h3 className="text-xl font-bold mb-4 line-clamp-1 group-hover:text-primary transition-all">{note.originalFileName}</h3>
+                                        <p className="text-slate-400 text-sm line-clamp-2">{note.summary.short}</p>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
