@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { notesService } from '../services/api';
 import { 
     Download, ChevronLeft, BookOpen, Lightbulb, 
     HelpCircle, Hash, MessageSquare, RotateCw, 
