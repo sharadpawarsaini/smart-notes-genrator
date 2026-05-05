@@ -22,6 +22,12 @@ const noteSchema = new mongoose.Schema({
     }],
     practicalApplications: [String],
     criticalThinking: [String],
+    subject: { type: String, default: 'General' },
+    examPredictions: [{
+        question: String,
+        probability: String, // 'High', 'Medium', 'Low'
+        reasoning: String
+    }],
     tags: [String],
     createdAt: { type: Date, default: Date.now }
 });

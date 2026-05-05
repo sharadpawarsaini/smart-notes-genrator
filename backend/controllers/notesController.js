@@ -80,6 +80,8 @@ exports.generateNotes = async (req, res) => {
         8. A Glossary of Terms (at least 5 terms and definitions).
         9. 3 Practical Applications of this knowledge.
         10. 3 Critical Thinking prompts for deep study.
+        11. Subject Category: Identify the academic subject (e.g., Physics, History, CS, Biology).
+        12. Exam Predictions: Predict 3-5 high-probability exam questions with reasoning.
 
         Format the response as a VALID JSON object with the following structure:
         {
@@ -91,7 +93,9 @@ exports.generateNotes = async (req, res) => {
             "mindMapCode": "graph TD\\n...",
             "glossary": [{"term": "...", "definition": "..."}],
             "practicalApplications": ["...", "..."],
-            "criticalThinking": ["...", "..."]
+            "criticalThinking": ["...", "..."],
+            "subject": "...",
+            "examPredictions": [{"question": "...", "probability": "High/Medium/Low", "reasoning": "..."}]
         }
 
         Text:
@@ -114,7 +118,9 @@ exports.generateNotes = async (req, res) => {
             originalFileName: fileName,
             extractedText,
             ...aiResponse,
-            tags: [fileName.split('.').pop()] 
+            subject: aiResponse.subject || 'General',
+            examPredictions: aiResponse.examPredictions || [],
+            tags: [aiResponse.subject || 'AI Generated'] 
         });
 
         await newNote.save();
