@@ -1,8 +1,10 @@
 const Note = require('../models/Note');
 const User = require('../models/User');
 const pdf = require('pdf-parse');
-const Tesseract = require('tesseract.js');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Groq = require('groq-sdk');
+
+const genAI = new GoogleGenerativeAI((process.env.GEMINI_API_KEY || '').trim());
 
 const groq = new Groq({
     apiKey: (process.env.GROQ_API_KEY || '').trim()
@@ -61,17 +63,25 @@ exports.processOCR = async (req, res) => {
             return res.status(400).json({ message: 'Please upload an image file' });
         }
 
-        console.log('Processing OCR for:', req.file.originalname);
+        console.log('Processing OCR with Gemini for:', req.file.originalname);
         
-        // Tesseract processing
-        const { data: { text } } = await Tesseract.recognize(
-            req.file.buffer,
-            'eng',
-            { logger: m => console.log(m.status, m.progress) }
-        );
+        // Use Gemini 1.5 Flash for super-fast OCR & Handwriting recognition
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        if (!text || text.trim().length < 10) {
-            return res.status(400).json({ message: 'Could not extract enough text from the image. Please ensure it is clear.' });
+        const result = await model.generateContent([
+            "Extract all text from this image accurately. If it is handwritten, transcribe it carefully. Only return the extracted text, no extra commentary.",
+            {
+                inlineData: {
+                    data: req.file.buffer.toString("base64"),
+                    mimeType: req.file.mimetype,
+                },
+            },
+        ]);
+
+        const text = result.response.text();
+
+        if (!text || text.trim().length < 5) {
+            return res.status(400).json({ message: 'Could not extract text. Please ensure the image is clear.' });
         }
 
         // Decrement trials if not subscribed

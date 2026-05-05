@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "crypto": "^1.0.1",
@@ -23,7 +24,6 @@
     "multer": "^2.1.1",
     "openai": "^6.35.0",
     "pdf-parse": "^2.4.5",
-    "razorpay": "^2.9.6",
-    "tesseract.js": "^7.0.0"
+    "razorpay": "^2.9.6"
   }
 }
